@@ -48,6 +48,7 @@
                 <li><a onclick="loadPrimary();">社交</a></li>
                 <li><a onclick="loadSecondary('analysis');">分析</a></li>
                 <li><a onclick="loadSecondary('contacts');">联系人</a></li>
+                <li><a href="<?php echo base_url('login/do_logout'); ?>">登出</a></li>
             </ul>
         </div>
         <div id="global-main">

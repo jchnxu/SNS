@@ -10,18 +10,18 @@ class Home extends CI_Controller {
     }
 
     public function index() {
-        $this->load->view('dashboard', array("content" => ""));
+        $this->load->view('dashboard_view', array("content" => ""));
     }
 
     public function settings() {
-        $this->load->view('dashboard', array("content" => "settings"));
+        $this->load->view('dashboard_view', array("content" => "settings"));
     }
 
     public function analysis() {
-        $this->load->view('dashboard', array("content" => "analysis"));
+        $this->load->view('dashboard_view', array("content" => "analysis"));
     }
 
     public function contacts() {
-        $this->load->view('dashboard', array("content" => "contacts"));
+        $this->load->view('dashboard_view', array("content" => "contacts"));
     }
 }
