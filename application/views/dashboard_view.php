@@ -10,6 +10,8 @@
 	<script src="<?php echo base_url(); ?>js/jquery-ui-1.10.3.custom.js"></script>
     
     <script>
+        
+        // controls
         $(function(){
             $("#global-menu").menu();
             $("#streams-list").sortable({
@@ -20,27 +22,52 @@
                 tolerance: "pointer"
             });
 
+            $("#add-sn-modal").dialog({
+                autoOpen: false    
+            });
+            $("#add-sn-button").click(function(){
+                $("#add-sn-modal").dialog("open");
+            });
+
+        });
+
+        // content management
+        $(function(){
             var content = "<?php echo $content; ?>";
             if (content != "") {
                 loadSecondary(content);
-            }
+            }    
         });
-
+     
         function loadPrimary() {
             window.history.pushState("", "", "<?php echo base_url('home'); ?>");
             $("#secondary-content").hide();
             $("#primary-content").show();
         }
-        function loadSecondary(name) {
-            window.history.pushState("", "", "<?php echo base_url('home'); ?>/" + name);
+        function loadSecondary(content) {
+            window.history.pushState("", "", "<?php echo base_url('home'); ?>/" + content);
             $("#primary-content").hide();
             $("#secondary-content").show();
+            
+            $.post(
+                "<?php echo base_url('ajax/load_secondary'); ?>",
+                {"content": content},
+                function(data, status){
+                    $("#secondary-content").text(data).html();
+                }
+            );
         }
     </script>
 
 </head>
 <body>
     <div id="notification-popup"></div>
+    <div id="modals">
+        <div id="add-sn-modal" title="添加社交网站">
+            <button>人人</button>
+            <button>微博</button>
+        </div>
+    </div>
     <div id="container">
         <div id="global-nav">
             <ul id="global-menu">
@@ -55,6 +82,7 @@
             <div id="primary-content" class="content">
                 <div id="streams-outer" class="">
                     <div id="streams-panel">
+                        <div id="add-sn-button">添加社交网站</div>
                     </div>
                     <ul id="streams-list" class="">
                         <li class="stream">content1</li>
