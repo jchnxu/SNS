@@ -32,7 +32,7 @@ class Login extends CI_Controller {
             $userdata = Array (
                 'is_logged_in' => true,
                 'user_id' => $result->user_id,
-                'user_nick_name' => $result->nick_name,
+                'user_nickname' => $result->nickname,
                 'user_email_address' => $result->email_address,
                 'user_avatar_url' => $result->avatar_url
             );

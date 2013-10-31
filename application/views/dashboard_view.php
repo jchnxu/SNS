@@ -5,6 +5,7 @@
 	<title>jQuery UI Example Page</title>
 	<link href="<?php echo base_url(); ?>css/normalize.css" rel="stylesheet">
 	<link href="<?php echo base_url(); ?>css/all.css" rel="stylesheet">
+	<link href="<?php echo base_url(); ?>css/secondary.css" rel="stylesheet">
 	<link href="<?php echo base_url(); ?>css/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet">
 	<script src="<?php echo base_url(); ?>js/jquery-1.9.1.js"></script>
 	<script src="<?php echo base_url(); ?>js/jquery-ui-1.10.3.custom.js"></script>
@@ -53,7 +54,7 @@
                 "<?php echo base_url('ajax/load_secondary'); ?>",
                 {"content": content},
                 function(data, status){
-                    $("#secondary-content").text(data).html();
+                    $("#secondary-content").html(data);
                 }
             );
         }
