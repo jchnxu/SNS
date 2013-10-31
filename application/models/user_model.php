@@ -36,8 +36,8 @@ class User_model extends CI_Model {
     }
 
     public function insert_new($email_address, $password) {
-        $sql = 'INSERT INTO user(email_address, password) VALUES (?, ?)';
-        return $this->db->query($sql, array($email_address, $password));
+        $sql = 'INSERT INTO user(email_address, password, nickname) VALUES (?, ?, ?)';
+        return $this->db->query($sql, array($email_address, $password, ''));
     }
 
     public function check_password($user_id, $password) {
