@@ -11,6 +11,7 @@ class Login extends CI_Controller {
         $this->form_validation->set_message('valid_email', '%s 不是正确的邮箱格式');
         $this->form_validation->set_message('matches', '%s 和 %s 必须相同');
         $this->form_validation->set_message('min_length', '%s 最小长度为%s位');
+        $this->form_validation->set_error_delimiters('<div class="text-warning">', '</div>');
     }
 
     public function index() {
@@ -26,9 +27,27 @@ class Login extends CI_Controller {
 
         $email_address = $this->input->post("email_address");
         $password = $this->input->post("password");
+
+        $config = Array(
+            Array(
+                'field' => 'email_address',
+                'label' => '邮箱',
+                'rules' => 'trim|required|valid_email'
+            )
+        );
+
+        $this->form_validation->set_rules($config);
+        if ($this->form_validation->run() == false) {
+            // validation fail
+            $this->_load_login_view('login', validation_errors());
+            return;
+        }
+
+        // check login in db
         $result = $this->user_model->check_login($email_address, sha1($password));
 
         if ($result != false) {
+            // login passed
             $userdata = Array (
                 'is_logged_in' => true,
                 'user_id' => $result->user_id,
@@ -41,7 +60,7 @@ class Login extends CI_Controller {
         }
         else {
             // return fail message with html tags
-            $this->_load_login_view('login', '邮箱或者密码不正确');
+            $this->_load_login_view('login', '<div class="text-warning">邮箱或者密码不正确</div>');
         }
 
     }
@@ -69,9 +88,9 @@ class Login extends CI_Controller {
 
         $this->form_validation->set_rules($config);
         if ($this->form_validation->run() != false) {
+            // register passed
             $this->user_model->insert_new($this->input->post('email_address'), sha1($this->input->post('password')));
-            // return success message with html tags
-            $this->_load_login_view('login', '注册成功！');
+            $this->_load_login_view('login', '<div class="text-success">注册成功！</div>');
         }
         else {
             // return fail message with html tags
