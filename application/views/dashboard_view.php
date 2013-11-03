@@ -1,3 +1,9 @@
+<?php
+	function genImage($src, $href) {
+	return '<a href="'.$href.'"><img src="'.$src.'" width=100,height=100 /></a>';
+}
+?>
+
 <!doctype html>
 <html lang="us">
 <head>
@@ -67,8 +73,8 @@
     <div id="notification-popup"></div>
     <div id="modals">
         <div id="add-sn-modal" title="添加社交网站">
-            <button>人人</button>
-            <button>微博</button>
+            <a href="https://graph.renren.com/oauth/authorize?client_id=205536&amp;response_type=code&amp;scope=publish_feed,status_update,photo_upload,read_user_feed,read_user_feed,read_user_status&amp;state=a%3d1%26b%3d2&amp;redirect_uri=http://127.0.0.1/SNS/sns_authorize/renren_authorize&amp;x_renew=true"><input type="button" name="renren" value="人人"/></a>
+            <a href="https://api.weibo.com/oauth2/authorize?client_id=1401769607&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fweibo_authorize&amp;response_type=code"><input type="button" name="weibo" value="微博"/></a>
         </div>
     </div>
     <div id="container">
@@ -89,7 +95,47 @@
                         </div>
                     </div>
                     <ul id="streams-list" class="">
-                        <li class="stream">content1</li>
+                        <li class="stream">
+                        	<?php foreach($statuses as $item):?>
+                        	<div><?php 
+                        
+                        			$updateTime = $item['created_at'];
+                        			$actorName = $item['user']['screen_name'];
+                        			$actorPhotoUrl = $item['user']['profile_image_url'];
+                        			$imagesrc = '<img src =' . $actorPhotoUrl . ' />';
+									$fowardPath = $item['text'];
+									
+									if(isset($item['retweeted_status'])){
+										$item = $item['retweeted_status'];
+									}
+									$contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
+                        			$content = $item['text'];
+                        			
+                        			if(isset($item['bmiddle_pic'])){
+										$contentImage = genImage($item['bmiddle_pic'],'#');
+									}else if(isset($item['original_pic'])){
+										$contentImage = genImage($f['original_pic'],'#');
+									}else if(isset($item['thumbnail_pic'])) {
+										$contentImage = genImage($item['thumbnail_pic'],'#');
+									}else {
+										$contentImage = '';
+									}
+									
+									echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+									echo $imagesrc;
+                        			echo $contenttitle;
+                        			echo "<br>";
+                        			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                        			echo $fowardPath;
+                        			echo $content;
+                        			echo "<br>";
+                        			echo $contentImage;
+                        			echo "<br>";
+                        			echo $updateTime;
+                        			echo "<br>";echo "<br>";?></div>
+                        	<br>
+                        	<?php endforeach;?>
+                        </li>
                         <li class="stream">content2</li>
                         <li class="stream">content3</li>
                     </ul>
