@@ -1,6 +1,24 @@
 #forms-wrapper {
     position: fixed;
-    bottom: 50px;
+    width: 200px;
+    margin-left: -100px;
+    left: 50%;
+    bottom: 100px;
+}
+
+.messages {
+    margin-bottom: 10px;
+}
+
+.messages > div {
+    display: block;
+    text-align: center;
+}
+
+.tab-button {
+    margin: 15px 15px 30px 15px;
+    font-size: 24px;
+    cursor: pointer;
 }
 
 #footer {
@@ -8,4 +26,9 @@
     bottom: 0px;
     left: 0px;
     height: 50px;
+    width: 100%;
+    text-align: center;
+
+    background-color: #fcfcfc;
+    border-top: 1px solid #84a60e;
 }
