@@ -50,9 +50,10 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = '127.0.0.1';
 $db['default']['username'] = 'root';
-$db['default']['password'] = 'xjcxjcxjc';
+$db['default']['password'] = 'kuangwudi';
 $db['default']['database'] = 'sns';
 $db['default']['dbdriver'] = 'mysql';
+$db['default']['port'] = "3306";
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
 $db['default']['db_debug'] = TRUE;
