@@ -17,6 +17,4 @@ class Authorization_model extends CI_Model {
         return $this->db->query($sql, array($accessToken, $user_id,$social_name));
 	}
 	
-	
-	
 }

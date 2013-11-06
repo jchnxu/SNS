@@ -68,14 +68,14 @@ class Ajax extends CI_Controller {
  
 
     public function load_secondary() {
-        $content = $this->input->post('content');
-        if ($content == 'settings') {
+        $page = $this->input->post('page');
+        if ($page == 'settings') {
             $this->_escape_load_view('secondary/settings_view');
         }
-        else if ($content == 'analysis') {
+        else if ($page == 'analysis') {
             $this->_escape_load_view('secondary/analysis_view');
         }
-        else if ($content == 'contacts') {
+        else if ($page == 'contacts') {
             $this->_escape_load_view('secondary/contacts_view');
         }
     }

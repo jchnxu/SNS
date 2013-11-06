@@ -12,7 +12,7 @@
   </form>
 </div>
 
-<div id="settings-outer">
+<div id="settings-outer" class="container">
     <div id="user-profile">
         <div class="image-uploader">
             <img id="user-avatar" src="<?php $url = trim($this->session->userdata('user_avatar_url')); echo $url === '' ? base_url('image/smiley.jpg') : $url; ?>" />

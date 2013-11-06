@@ -2,6 +2,7 @@
 	function genImage($src, $href) {
 	return '<a href="'.$href.'"><img src="'.$src.'" width=100,height=100 /></a>';
 }
+
 ?>
 
 <!doctype html>
@@ -19,7 +20,34 @@
 	<script src="<?php echo base_url(); ?>js/jquery-ui-1.10.3.custom.js"></script>
     
     <script>
-        
+         // page management
+        $(function(){
+            var page = "<?php echo $page; ?>";
+            if (page != "") {
+                loadSecondary(page);
+            }    
+        });
+     
+        function loadPrimary() {
+            window.history.pushState("", "", "<?php echo base_url('home'); ?>");
+            $("#secondary-page").hide();
+            $("#primary-page").show();
+        }
+        function loadSecondary(page) {
+            window.history.pushState("", "", "<?php echo base_url('home'); ?>/" + page);
+            $("#primary-page").hide();
+            $("#secondary-page").show();
+            
+            $.post(
+                "<?php echo base_url('ajax/load_secondary'); ?>",
+                {"page": page},
+                function(data, status){
+                    $("#secondary-page").html(data);
+                }
+            );
+        }
+
+       
         // controls
         $(function(){
             //$("#global-menu").menu();
@@ -28,7 +56,8 @@
                 revert: true,
                 placeholder: "stream-placeholder",
                 axis: "x",
-                tolerance: "pointer"
+                tolerance: "pointer",
+                handle: ".stream-title"
             });
 
             $("#add-sn-modal").dialog({
@@ -40,32 +69,43 @@
 
         });
 
-        // content management
-        $(function(){
-            var content = "<?php echo $content; ?>";
-            if (content != "") {
-                loadSecondary(content);
-            }    
-        });
-     
-        function loadPrimary() {
-            window.history.pushState("", "", "<?php echo base_url('home'); ?>");
-            $("#secondary-content").hide();
-            $("#primary-content").show();
+        // authorization callbacks
+        function weibo_auth_callback(msg) {
+            alert(msg);
+            // TODO refresh the default stream here
         }
-        function loadSecondary(content) {
-            window.history.pushState("", "", "<?php echo base_url('home'); ?>/" + content);
-            $("#primary-content").hide();
-            $("#secondary-content").show();
+
+        function renren_auth_callback(msg) {
+            alert(msg);
+            // TODO refresh the default stream here
+        }
+
+        // streams
+        $(function(){
+            change_stream_list_width(<?php echo count($stream_contents); ?>*400);
+            $("#stream-add").hide();
+
+        });
+        function add_stream(account_id, stream_id) {
             
             $.post(
-                "<?php echo base_url('ajax/load_secondary'); ?>",
-                {"content": content},
+                "<?php echo base_url('home/add_stream'); ?>",
+                {
+                    "account_id": account_id,
+                    "stream_id": stream_id
+                },
                 function(data, status){
-                    $("#secondary-content").html(data);
+                    change_stream_list_width(parseInt($("#streams-list").width) + 400);
+                    $("#streams-list").prepend('<div class="stream">' + data + "</div>");
                 }
             );
         }
+        function remove_stream() {
+        }
+        function change_stream_list_width(width) {
+            $("#streams-list").width(width);
+        }
+
     </script>
 
 </head>
@@ -73,13 +113,14 @@
     <div id="notification-popup"></div>
     <div id="modals">
         <div id="add-sn-modal" title="添加社交网站">
-            <a href="https://graph.renren.com/oauth/authorize?client_id=205536&amp;response_type=code&amp;scope=publish_feed,status_update,photo_upload,read_user_feed,read_user_feed,read_user_status&amp;state=a%3d1%26b%3d2&amp;redirect_uri=http://127.0.0.1/SNS/sns_authorize/renren_authorize&amp;x_renew=true"><input type="button" name="renren" value="人人"/></a>
-            <a href="https://api.weibo.com/oauth2/authorize?client_id=1401769607&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fweibo_authorize&amp;response_type=code"><input type="button" name="weibo" value="微博"/></a>
+            <a target="_blank" onclick="window.open('<?php echo $auth_url['renren']; ?>');"><input type="button" name="renren" value="人人"/></a>
+            <a target="_blank" onclick="window.open('https://api.weibo.com/oauth2/authorize?client_id=1401769607&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fweibo_authorize&amp;response_type=code&amp;forcelogin=true','newwindow');"><input type="button" name="weibo" value="微博"/></a>
         </div>
     </div>
     <div id="container">
         <div id="global-nav">
             <ul id="global-menu" class="nav nav-tabs nav-stacked">
+                <li><a onclick="$('#stream-add').toggle();" class="fui-plus"></a></li>
                 <li><a onclick="loadSecondary('settings');" class="fui-gear"></a></li>
                 <li><a onclick="loadPrimary();" class="fui-list"></a></li>
                 <li><a onclick="loadSecondary('analysis');" class="fui-eye"></a></li>
@@ -88,57 +129,76 @@
             </ul>
         </div>
         <div id="global-main">
-            <div id="primary-content" class="content">
+            <div id="primary-page" class="page">
                 <div id="streams-outer" class="">
                    <div id="stream-add">
                         <div class="">
+                            <?php foreach ($add_stream_options as $add_stream_option): ?>
+                            <div class="account-title">
+                                <?php echo $add_stream_option['account']->account_id; ?>
+                            </div>
+                            <div class="account-stream-options">
+                                <?php foreach ($add_stream_option['stream_options'] as $stream_option): ?>
+                                <div class="stream-option">
+                                    <a onclick="add_stream(<?php echo $add_stream_option['account']->account_id; ?>, <?php echo $stream_option->stream_id;?> );">
+                                        <?php echo $stream_option->stream_name ?>
+                                    </a>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                    <ul id="streams-list" class="">
-                        <li class="stream">
-                        	<?php foreach($statuses as $item):?>
-                        	<div><?php 
-                        
-                        			$updateTime = $item['created_at'];
-                        			$actorName = $item['user']['screen_name'];
-                        			$actorPhotoUrl = $item['user']['profile_image_url'];
-                        			$imagesrc = '<img src =' . $actorPhotoUrl . ' />';
-									$fowardPath = $item['text'];
-									
-									if(isset($item['retweeted_status'])){
-										$item = $item['retweeted_status'];
-									}
-									$contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
-                        			$content = $item['text'];
-                        			
-                        			if(isset($item['bmiddle_pic'])){
-										$contentImage = genImage($item['bmiddle_pic'],'#');
-									}else if(isset($item['original_pic'])){
-										$contentImage = genImage($f['original_pic'],'#');
-									}else if(isset($item['thumbnail_pic'])) {
-										$contentImage = genImage($item['thumbnail_pic'],'#');
-									}else {
-										$contentImage = '';
-									}
-									
-									echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-									echo $imagesrc;
-                        			echo $contenttitle;
-                        			echo "<br>";
-                        			echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                        			echo $fowardPath;
-                        			echo $content;
-                        			echo "<br>";
-                        			echo $contentImage;
-                        			echo "<br>";
-                        			echo $updateTime;
-                        			echo "<br>";echo "<br>";?></div>
-                        	<br>
-                        	<?php endforeach;?>
-                        </li>
-                        <li class="stream">content2</li>
-                        <li class="stream">content3</li>
-                    </ul>
+                    <div id="streams-list-outer">
+                        <ul id="streams-list" class="">
+                            <?php foreach( $stream_contents as $stream_content ) : ?>
+                            <li class="stream">
+                                <div class="stream-title">
+                                title
+                                </div>
+                                <?php foreach($stream_content['stream_items'] as $item):?>
+                                <div><?php 
+                            
+                                        $updateTime = $item['created_at'];
+                                        $actorName = $item['user']['screen_name'];
+                                        $actorPhotoUrl = $item['user']['profile_image_url'];
+                                        $imagesrc = '<img src =' . $actorPhotoUrl . ' />';
+                                        $fowardPath = $item['text'];
+                                        
+                                        if(isset($item['retweeted_status'])){
+                                            $item = $item['retweeted_status'];
+                                        }
+                                        $contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
+                                        $content = $item['text'];
+                                        
+                                        if(isset($item['bmiddle_pic'])){
+                                            $contentImage = genImage($item['bmiddle_pic'],'#');
+                                        }else if(isset($item['original_pic'])){
+                                            $contentImage = genImage($f['original_pic'],'#');
+                                        }else if(isset($item['thumbnail_pic'])) {
+                                            $contentImage = genImage($item['thumbnail_pic'],'#');
+                                        }else {
+                                            $contentImage = '';
+                                        }
+                                        
+                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                        echo $imagesrc;
+                                        echo $contenttitle;
+                                        echo "<br>";
+                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                        echo $fowardPath;
+                                        echo $content;
+                                        echo "<br>";
+                                        echo $contentImage;
+                                        echo "<br>";
+                                        echo $updateTime;
+                                        echo "<br>";echo "<br>";?></div>
+                                <br>
+                                <?php endforeach;?>
+                            </li>
+                            <?php endforeach;?>
+                        </ul>
+                    </div>
                     <div id="streams-panel">
                         <div class="left">
                             <input type="text" class="form-control" placeholder="发布状态">
@@ -153,7 +213,7 @@
                     </div>
                 </div>
             </div>
-            <div id="secondary-content" class="content">
+            <div id="secondary-page" class="page">
             </div>
         </div>
 
