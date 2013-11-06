@@ -37,5 +37,23 @@ define('FOPEN_WRITE_CREATE_STRICT',				'xb');
 define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 
 
+/*
+|--------------------------------------------------------------------------
+| Authorization Messages 
+|--------------------------------------------------------------------------
+|
+|
+*/
+// weibo
+define( "WB_AKEY" , '1401769607' );
+define( "WB_SKEY" , '85f705b36f3fd2c1eec81caec8274fbf' );
+define( "WB_CALLBACK_URL" , 'http://127.0.0.1/SNS/sns_authorize/weibo_authorize' );
+
+// renren 
+define ( "APP_KEY", '554f0b79093642918f322e31ced90960' );
+define ( "APP_SECRET", '7d8492648f044ec6a7eb1141be77dd27' );
+define ( "CALLBACK_URL", "http://127.0.0.1/sns/sns_authorize/renren_authorize" );
+
+
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

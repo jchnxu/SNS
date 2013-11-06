@@ -1,6 +1,6 @@
 <?php if(! defined('BASEPATH')) exit('No direct script access allowed');
-	require_once 'weibo_config.php';
-	require_once 'saetv2.ex.class.php';
+	#require_once 'weibo_config.php';
+	#require_once 'saetv2.ex.class.php';
 	#require_once 'renren_config.php';
 	require_once 'RenrenOAuthApiService.class.php';
 	require_once 'RenrenRestApiService.class.php';	
@@ -13,89 +13,162 @@ class Sns_authorize extends CI_Controller {
 	}
 
 	public function weibo_authorize(){
-		$o = new SaeTOAuthV2(WB_AKEY,WB_SKEY);
+
+        $this->load->library('weibo_oauth', array("client_id" => WB_AKEY, 'client_secret' => WB_SKEY));
 		
-		if (isset($_REQUEST['code'])) {
-		$keys = array();
-		$keys['code'] = $_REQUEST['code'];
-		$keys['redirect_uri'] = WB_CALLBACK_URL;
-			try {
-				$token = $o->getAccessToken( 'code', $keys ) ;
-			} catch (OAuthException $e) {
-			}
+        if (isset($_REQUEST['code'])) {
+            $keys = array();
+            $keys['code'] = $_REQUEST['code'];
+            $keys['redirect_uri'] = WB_CALLBACK_URL;
+            try {
+                $token = $this->weibo_oauth->getAccessToken( 'code', $keys ) ;
+            } catch (OAuthException $e) {
+            }
 		}
+        else {
+            // get code failed, will generate error in later code
+            $token = false;
+        }
 		
+        // check authorize ok, update db
 		if ($token) {
-			$cookieString = 'weibojs_'.$o->client_id;
-			session_start();
-			$_SESSION['weibo_access_token'] = $token;
-			$_SESSION['weibo_cookie_string'] = $cookieString;
-			setcookie('weibojs_'.$o->client_id, http_build_query($token));
+            // authorize ok
+
+            // set session and cookie
+			$cookieString = 'weibojs_'.$this->weibo_oauth->client_id;
+            /*
+            $this->session->set_userdata(array(
+                'weibo_access_token' => $token,
+                'weibo_cookie_string' => $cookieString
+            ));
+            */
+			setcookie('weibojs_'.$this->weibo_oauth->client_id, http_build_query($token));
+            
+            $message = $this->_update_db(
+                $this->session->userdata('user_id'), // user_id
+                'Weibo', // social_name
+                $token['uid'], // sn_user_id
+                $token['access_token'], // token1
+                '', // token2
+                1, // default_stream_id, here weibo home_timeline
+                '微博添加成功！', // ok message
+                '该微博帐号已经添加过了' // already added message
+            );
 			
-			$accessToken = $_SESSION['weibo_access_token']['access_token'];
-			
-			
-			$this->load->model('authorization_model','OP');
-			//$user_id = $_SESSION['user_id'];
-			$user_id = 1;
-			$this->OP->insert_account($user_id,$accessToken,"Weibo");
-			
-			
-			header("Location: " . base_url('home'));
-		}
+        }
+        else {
+            // authorize failed
+            $message = '微博认证失败';
+        }
+        
+        // generate html, for cross-page sending $message 
+        echo 
+            '<!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="utf-8">
+            <script type="text/javascript" src="js/jquery-1.9.1.js">
+            </script>
+            <script>
+                function send_back() {
+                    window.opener.weibo_auth_callback("' . $message . '");
+                    window.close();
+                }
+            </script>
+            </head>
+            <body onload="send_back();">
+            </body>
+            </html>';
+        
 	}
 	
 	public	function renren_authorize(){
 
-		$code = $_GET['code'];
-		#echo $code;
-		
-		$config                         = new stdClass;
+        $this->load->library('renren_client');
+        $client = $this->renren_client->build(array('client_id' => APP_KEY, 'client_secret' => APP_SECRET));
 
-		$config->APIURL         = 'http://api.renren.com/restserver.do'; //RenRenÕ¯µƒAPIµ˜”√µÿ÷∑£¨≤ª–Ë“™–ﬁ∏ƒ
-		$config->APPID          = '205536';      //ƒ„µƒAPI Key£¨«Î◊‘––…Í«Î
-		$config->APIKey         = '554f0b79093642918f322e31ced90960';   //ƒ„µƒAPI Key£¨«Î◊‘––…Í«Î
-		$config->SecretKey      = '7d8492648f044ec6a7eb1141be77dd27';   //ƒ„µƒAPI √‹‘ø
-		$config->APIVersion     = '1.0';        //µ±«∞APIµƒ∞Ê±æ∫≈£¨≤ª–Ë“™–ﬁ∏ƒ
-		$config->decodeFormat   = 'json';       //ƒ¨»œµƒ∑µªÿ∏Ò Ω£¨∏˘æ› µº «Èøˆ–ﬁ∏ƒ£¨÷ß≥÷£∫json,xml
+        // 处理code -- 根据code来获得token
+        if (isset ( $_REQUEST ['code'] )) {
+            $keys = array ();
+            
+            // 验证state，防止伪造请求跨站攻击
+            /*
+            $state = $_REQUEST ['state'];
+            if (empty ( $state ) || $state !== $_SESSION ['renren_state']) {
+                echo '非法请求！';
+                exit ();
+            }
+            unset ( $_SESSION ['renren_state'] );
+            */
+            
+            // 获得code
+            $keys ['code'] = $_REQUEST ['code'];
+            $keys ['redirect_uri'] = CALLBACK_URL;
+            try {
+                // 根据code来获得token
+                $token = $client->getTokenFromTokenEndpoint ( 'code', $keys );
+            } catch ( RennException $e ) {
+                //var_dump ( $e );
+            }
+        }
 
-		$config->redirecturi= 'http://127.0.0.1/SNS/sns_authorize/renren_authorize';//ƒ„µƒªÒ»°codeµƒªÿµ˜µÿ÷∑£¨“≤ «accesstokenµƒªÿµ˜µÿ÷∑
-		$config->scope='publish_feed,status_update,photo_upload,read_user_feed,read_user_feed,read_user_status';
-	
-		
-		if($code){
-			// get new access_token
-			$oauthApi = new RenrenOAuthApiService;
-			$postParams = array(
-						'client_id' => $config->APIKey,
-						'client_secret' => $config->SecretKey,
-						'redirect_uri' => $config->redirecturi,
-						'grant_type' => 'authorization_code',
-						'code' => $code
-					);
-			$tokenUrl = 'http://graph.renren.com/oauth/token';
-			$accessInfo = $oauthApi->rr_post_curl($tokenUrl, $postParams);
-			$accessToken = $accessInfo['access_token'];
-			$expiresIn = $accessInfo['expires_in'];
-			$refreshToken = $accessInfo['refresh_token'];
-		
-			// store infos
-			session_start();
-			$_SESSION['renren_access_token'] = $accessToken;
-			$_SESSION['renren_refresh_token'] = $refreshToken;
-			
-			$user_id = 1;
-			$this->load->model('Authorization_model','OP');
-			//$user_id = $_SESSION['user_id'];
-			$this->OP->insert_account($user_id,$accessToken,"Renren");
-			
-		
-			// redirect
-			header("Location: " . base_url('home'));
-		}else {
-		echo 'error: parameter code is null, here is the query string<br>';
-		echo $_SERVER['QUERY_STRING'];
-		}
-	}
+        // check authorize ok, update db
+        if ($token) {
+            // ok
+            $message = $this->_update_db(
+                $this->session->userdata('user_id'), // user_id
+                'Renren', // social_name
+                $client->getUserService()->getUserLogin()['id'], // sn_user_id
+                $token->accessToken, // token1
+                '', // token2
+                2, // default_stream_id, here renren home
+                '人人添加成功！', // ok message
+                '该人人帐号已经添加过了' // already added message
+            );
+        }
+        else {
+            // fail
+            $message = '人人认证失败';
+        }
 
+        // generate html, for cross-page sending $message 
+        echo 
+            '<!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="utf-8">
+            <script type="text/javascript" src="js/jquery-1.9.1.js">
+            </script>
+            <script>
+                function send_back() {
+                    window.opener.renren_auth_callback("' . $message . '");
+                    window.close();
+                }
+            </script>
+            </head>
+            <body onload="send_back();">
+            </body>
+            </html>';
+
+    }
+
+    private function _update_db($user_id, $social_name, $sn_user_id, $token1, $token2, $default_stream_id, $msg_ok, $msg_already) {
+        
+        $this->load->model('account_model');
+        $this->load->model('account_stream_model');
+
+        // update db
+        $account_id = $this->account_model->get_id($user_id, $social_name, $sn_user_id);
+        if ($account_id === false) {
+            // this account is new here
+            $account_id = $this->account_model->insert_new($user_id, $social_name, $sn_user_id, $token1, $token2);
+            $this->account_stream_model->insert_new($account_id, $default_stream_id, 1); // insert a default stream, (account_id, stream_id, rank) 
+            return $msg_ok;
+        }
+        else {
+            // this account already exists 
+            $this->account_model->update($user_id, $social_name, $sn_user_id, $token1, $token2);
+            return $msg_already;
+        }
+    }
 }
