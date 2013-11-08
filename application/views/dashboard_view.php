@@ -153,48 +153,52 @@
                         <ul id="streams-list" class="">
                             <?php foreach( $stream_contents as $stream_content ) : ?>
                             <li class="stream">
-                                <div class="stream-title">
-                                title
-                                </div>
-                                <?php foreach($stream_content['stream_items'] as $item):?>
-                                <div><?php 
-                            
-                                        $updateTime = $item['created_at'];
-                                        $actorName = $item['user']['screen_name'];
-                                        $actorPhotoUrl = $item['user']['profile_image_url'];
-                                        $imagesrc = '<img src =' . $actorPhotoUrl . ' />';
-                                        $fowardPath = $item['text'];
-                                        
-                                        if(isset($item['retweeted_status'])){
-                                            $item = $item['retweeted_status'];
-                                        }
-                                        $contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
-                                        $content = $item['text'];
-                                        
-                                        if(isset($item['bmiddle_pic'])){
-                                            $contentImage = genImage($item['bmiddle_pic'],'#');
-                                        }else if(isset($item['original_pic'])){
-                                            $contentImage = genImage($f['original_pic'],'#');
-                                        }else if(isset($item['thumbnail_pic'])) {
-                                            $contentImage = genImage($item['thumbnail_pic'],'#');
-                                        }else {
-                                            $contentImage = '';
-                                        }
-                                        
-                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                                        echo $imagesrc;
-                                        echo $contenttitle;
-                                        echo "<br>";
-                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                                        echo $fowardPath;
-                                        echo $content;
-                                        echo "<br>";
-                                        echo $contentImage;
-                                        echo "<br>";
-                                        echo $updateTime;
-                                        echo "<br>";echo "<br>";?></div>
-                                <br>
-                                <?php endforeach;?>
+                                <?php if($stream_content['social_name'] == 'Weibo'): ?>
+                                    <div class="stream-title">
+                                    title
+                                    </div>
+                                    <?php foreach($stream_content['stream_items'] as $item):?>
+                                    <div><?php 
+                                
+                                            $updateTime = $item['created_at'];
+                                            $actorName = $item['user']['screen_name'];
+                                            $actorPhotoUrl = $item['user']['profile_image_url'];
+                                            $imagesrc = '<img src =' . $actorPhotoUrl . ' />';
+                                            $fowardPath = $item['text'];
+                                            
+                                            if(isset($item['retweeted_status'])){
+                                                $item = $item['retweeted_status'];
+                                            }
+                                            $contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
+                                            $content = $item['text'];
+                                            
+                                            if(isset($item['bmiddle_pic'])){
+                                                $contentImage = genImage($item['bmiddle_pic'],'#');
+                                            }else if(isset($item['original_pic'])){
+                                                $contentImage = genImage($f['original_pic'],'#');
+                                            }else if(isset($item['thumbnail_pic'])) {
+                                                $contentImage = genImage($item['thumbnail_pic'],'#');
+                                            }else {
+                                                $contentImage = '';
+                                            }
+                                            
+                                            echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                            echo $imagesrc;
+                                            echo $contenttitle;
+                                            echo "<br>";
+                                            echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                            echo $fowardPath;
+                                            echo $content;
+                                            echo "<br>";
+                                            echo $contentImage;
+                                            echo "<br>";
+                                            echo $updateTime;
+                                            echo "<br>";echo "<br>";?></div>
+                                    <br>
+                                    <?php endforeach;?>
+                                <?php else: ?>
+                                    <?php print_r($stream_content['stream_items']); ?>
+                                <?php endif; ?>
                             </li>
                             <?php endforeach;?>
                         </ul>
