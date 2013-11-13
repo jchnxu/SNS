@@ -131,7 +131,23 @@
         <div id="global-main">
             <div id="primary-page" class="page">
                 <div id="streams-outer" class="">
-                   <div id="stream-add">
+                
+                    <div id="streams-panel">
+                        <div id="publish-panel">
+                            <input id="status-input" class="form-control" placeholder="我正在干什么？"/>
+                            <div id="public-status-button" class="btn">发布状态</div>
+                        </div>
+                    
+                        <div id="platforms-panel">
+                            <div id="add-sn-button" class="btn btn-info">
+                                添加社交网络
+                            </div>
+                            <div id="sn-list" class="">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="stream-add">
                         <div class="">
                             <?php foreach ($add_stream_options as $add_stream_option): ?>
                             <div class="account-title">
@@ -203,18 +219,7 @@
                             <?php endforeach;?>
                         </ul>
                     </div>
-                    <div id="streams-panel">
-                        <div class="left">
-                            <input type="text" class="form-control" placeholder="发布状态">
-                        </div>
-                        <div class="right">
-                            <div id="search-bar" class="inline-block">
-                                搜索
-                            </div>
-                            <div id="add-sn-button" class="btn">添加社交网站</div>
-                            <div id="add-stream-button" class="btn">添加流</div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
             <div id="secondary-page" class="page">

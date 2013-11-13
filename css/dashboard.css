@@ -45,8 +45,6 @@ body {
     /* use js to control width */
     height: 100%;
     position: relative;
-    overflow-x: auto;
-    overflow-y: hidden;
 }
 
 
@@ -54,17 +52,30 @@ body {
 #streams-panel {
     position: absolute;
     width: 100%;
-    bottom: 0;
+    top: 0;
     right: 0;
-    left: 0;
+    height: 50px;
+    
+    padding-top: 5px;
+
+    background-color: #fcfcfc;
+    border-bottom: 1px solid #84a60e;
 }
 
-#streams-panel .left {
-    float: left;
+#status-input {
+    display: inline-block;
+    height: 42px;
+    vertical-align: top;
+    width: 300px;
 }
-#streams-panel .right {
+
+#publish-panel{
+    float: left;    
+}
+#platforms-panel {
     float: right;
 }
+
 
 /* stream add */
 #stream-add {
@@ -79,14 +90,14 @@ body {
 /* stream list */
 #streams-list-outer {
     position: absolute;
-    bottom: 43px;
-    top: 0;
+    top: 50px;
+    bottom: 0px;
     left: 0;
     right: 0;
-    float: left;
-
-    padding: 0;
-    margin: 0;
+    width: 100%;
+        
+    overflow-x: scroll;
+    overflow-y: hidden;
 }
 #streams-list {
     height: 100%;
