@@ -1,5 +1,8 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+require_once 'tx_Config.php';
+require_once 'Tencent.php';
+
 class Ajax extends CI_Controller {
 
     public function update_nickname() {
@@ -70,21 +73,64 @@ class Ajax extends CI_Controller {
     public function load_secondary() {
         $page = $this->input->post('page');
         if ($page == 'settings') {
-            $this->_escape_load_view('secondary/settings_view');
+            $this->_escape_load_view('secondary/settings_view',array());
         }
         else if ($page == 'analysis') {
-            $this->_escape_load_view('secondary/analysis_view');
+            $this->_escape_load_view('secondary/analysis_view',array());
         }
         else if ($page == 'contacts') {
-            $this->_escape_load_view('secondary/contacts_view');
+        
+        	OAuth::init(TX_AKEY, TX_SKEY);
+        	session_start();
+        	$params = array( 
+    				"format" => "json", 
+    				"reqnum" => "3", 
+    				"startindex" => "0", 
+    				"mode" => "0", 
+    				"install" => "0", 
+    				"sex" => "0"
+    			);
+    		$r = Tencent::api('friends/fanslist',$params,"GET",false);
+    		$content['Txweibo_friends'] = json_decode($r,true);
+    		
+    		
+    		$this->load->library('weibo_client');
+            $client = $this->weibo_client->build(array(
+                'akey' => WB_AKEY,
+                'skey' => WB_SKEY, 
+                'access_token' => $_SESSION['s_access_token'])
+            );
+            $uid = $_SESSION['s_uid'];
+            $content['Weibo_friends'] = $client->bilateral( $uid, $page = 1, $count = 50, $sort = 0 ); 
+            
+            
+            $this->load->library('renren_client');
+            $client = $this->renren_client->build(array(
+                'client_id' => APP_KEY,
+                'client_secret' => APP_SECRET
+            ));
+            $t = unserialize($_SESSION['r_access_token']);
+            $client->authWithToken($t);
+            $content['Renren_friends_num'] = $client->getFriendService()->listFriend($_SESSION['r_uid'],5,1); 
+            $content['Renren_friends'] = array();
+            
+            
+            foreach($content['Renren_friends_num'] as $userId){
+            	$info = $client->getUserService()->getUser($userId);
+            	array_push($content['Renren_friends'],$info);
+            }
+            
+            $this->_escape_load_view('secondary/contacts_view',array());
         }
     }
 
-    private function _escape_load_view($view) {
+    private function _escape_load_view($view,$data) {
         $this->load->helper('url');
         ob_start();
         //include('application/views/secondary/settings_view.php');
-        $this->load->view($view);
+        
+        
+        $this->load->view($view,$data);
         $output = ob_get_contents();
         ob_end_clean();
         echo $output;

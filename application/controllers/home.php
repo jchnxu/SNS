@@ -1,5 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+
+require_once 'tx_Config.php';
+require_once 'Tencent.php';
+
+
+
 class Home extends CI_Controller {
 
     private $auth_url = array();
@@ -90,6 +96,10 @@ class Home extends CI_Controller {
         if ($stream->social_name == 'Weibo') {
             
             $this->load->library('weibo_client');
+            
+            $_SESSION['s_access_token'] = $stream->token1;
+            $_SESSION['s_uid'] = $stream->sn_user_id;
+                        
             $client = $this->weibo_client->build(array(
                 'akey' => WB_AKEY,
                 'skey' => WB_SKEY, 
@@ -98,7 +108,11 @@ class Home extends CI_Controller {
 
             // check stream type
             if ($stream->stream_id == 1) { // home timeline
+
+                $content['stream_items'] = $client->public_timeline()['statuses']; 
+
                 $content['stream_items'] = $client->home_timeline(1, 10)['statuses']; 
+
             }
             else {
             }
@@ -109,9 +123,14 @@ class Home extends CI_Controller {
                 'client_id' => APP_KEY,
                 'client_secret' => APP_SECRET
             ));
+           
+            $_SESSION['r_access_token'] = $stream->token1;
+            $_SESSION['r_uid'] = $stream->sn_user_id;
+            
             //$client->authWithStoredToken();
             $t = unserialize($stream->token1);
             $client->authWithToken($t);
+        
 
             // check stream type
             if ($stream->stream_id == 2) { // home
@@ -120,6 +139,67 @@ class Home extends CI_Controller {
             else {
             }
         }
+        
+        
+        else if ($stream->social_name == 'Douban') {
+        	
+        	$accesstoken = $stream->token1;
+        	
+        	#获取用户信息
+			$ch = curl_init();
+			curl_setopt($ch,CURLOPT_URL,'https://api.douban.com/v2/user/~me');
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: ' . 'Bearer ' . $accesstoken)); 
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+			$res = curl_exec($ch);
+			curl_close($ch);
+			$user_data = json_decode($res,true);
+			$uid = $user_data['uid'];
+        	
+        	if ($stream->stream_id == 3) {
+        		$ch = curl_init();
+				curl_setopt($ch,CURLOPT_URL,'https://api.douban.com/v2/note/user_created/'.$uid);
+				curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+				$response = curl_exec($ch);
+				curl_close($ch);
+				$content['stream_items'] = json_decode($response,true);
+				
+			} 
+			else {
+			
+			}
+		
+        }
+        
+        else if ($stream->social_name == 'Txweibo') {
+        	
+        	$accesstoken = $stream->token1;
+        	$openid = $stream->token2;
+        	OAuth::init(TX_AKEY, TX_SKEY);
+			//打开session
+			session_start();
+			$_SESSION['t_access_token'] = $accesstoken;
+			$_SESSION['t_openid'] = $openid;
+			
+			if ($stream->stream_id == 4) {
+				$params = array( 
+    				"format" => "json", 
+    				"pageflag" => "0", 
+    				"pagetime" => "0", 
+    				"reqnum" => "20", 
+    				"type" => "0", 
+    				"contenttype" => "0"
+    			);
+    			$r = Tencent::api('statuses/home_timeline',$params,"GET",false);
+
+    			$content['stream_items'] = json_decode($r,true);
+    		} else {
+    	
+    		
+    		}
+        
+        }
+        
+        
         else if (1){
             // baidu 
         }

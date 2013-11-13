@@ -61,7 +61,7 @@
             });
 
             $("#add-sn-modal").dialog({
-                autoOpen: false    
+                //autoOpen: false    
             });
             $("#add-sn-button").click(function(){
                 $("#add-sn-modal").dialog("open");
@@ -76,6 +76,16 @@
         }
 
         function renren_auth_callback(msg) {
+            alert(msg);
+            // TODO refresh the default stream here
+        }
+        
+        function douban_auth_callback(msg) {
+            alert(msg);
+            // TODO refresh the default stream here
+        }
+        
+        function txweibo_auth_callback(msg) {
             alert(msg);
             // TODO refresh the default stream here
         }
@@ -114,7 +124,9 @@
     <div id="modals">
         <div id="add-sn-modal" title="添加社交网站">
             <a target="_blank" onclick="window.open('<?php echo $auth_url['renren']; ?>');"><input type="button" name="renren" value="人人"/></a>
-            <a target="_blank" onclick="window.open('https://api.weibo.com/oauth2/authorize?client_id=1401769607&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fweibo_authorize&amp;response_type=code&amp;forcelogin=true','newwindow');"><input type="button" name="weibo" value="微博"/></a>
+            <a target="_blank" onclick="window.open('https://api.weibo.com/oauth2/authorize?client_id=1401769607&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fweibo_authorize&amp;response_type=code&amp;forcelogin=true','newwindow');"><input type="button" name="weibo" value="新浪微博"/></a>
+            <a target="_blank" onclick="window.open('https://www.douban.com/service/auth2/auth?client_id=0b412ba5398070c021c382efac815240&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fdouban_authorize&amp;response_type=code&amp;scope=shuo_basic_r,shuo_basic_w,douban_basic_common,douban_basic_note&amp;forcelogin=true','newwindow');"><input type="button" name="weibo" value="豆瓣"/></a>
+            <a target="_blank" onclick="window.open('https://open.t.qq.com/cgi-bin/oauth2/authorize?client_id=801440907&redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Ftxweibo_authorize&response_type=code&amp;forcelogin=true','newwindow');"><input type="button" name="weibo" value="腾讯微博"/></a>
         </div>
     </div>
     <div id="container">
@@ -169,6 +181,51 @@
                         <ul id="streams-list" class="">
                             <?php foreach( $stream_contents as $stream_content ) : ?>
                             <li class="stream">
+
+                                <div class="stream-title">
+                                title
+                                </div>
+                                <?php foreach($stream_content['stream_items'] as $item):?>
+                                <div><?php 
+                            			/*
+                                        $updateTime = $item['created_at'];
+                                        $actorName = $item['user']['screen_name'];
+                                        $actorPhotoUrl = $item['user']['profile_image_url'];
+                                        $imagesrc = '<img src =' . $actorPhotoUrl . ' />';
+                                        $fowardPath = $item['text'];
+                                        
+                                        if(isset($item['retweeted_status'])){
+                                            $item = $item['retweeted_status'];
+                                        }
+                                        $contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
+                                        $content = $item['text'];
+                                        
+                                        if(isset($item['bmiddle_pic'])){
+                                            $contentImage = genImage($item['bmiddle_pic'],'#');
+                                        }else if(isset($item['original_pic'])){
+                                            $contentImage = genImage($f['original_pic'],'#');
+                                        }else if(isset($item['thumbnail_pic'])) {
+                                            $contentImage = genImage($item['thumbnail_pic'],'#');
+                                        }else {
+                                            $contentImage = '';
+                                        }
+                                        
+                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                        echo $imagesrc;
+                                        echo $contenttitle;
+                                        echo "<br>";
+                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                                        echo $fowardPath;
+                                        echo $content;
+                                        echo "<br>";
+                                        echo $contentImage;
+                                        echo "<br>";
+                                        echo $updateTime;*/
+										print_r($item);
+                                        echo "<br>";echo "<br>";?></div>
+                                <br>
+                                <?php endforeach;?>
+
                                 <?php if($stream_content['social_name'] == 'Weibo'): ?>
                                     <div class="stream-title">
                                     title
@@ -215,6 +272,7 @@
                                 <?php else: ?>
                                     <?php print_r($stream_content['stream_items']); ?>
                                 <?php endif; ?>
+
                             </li>
                             <?php endforeach;?>
                         </ul>
