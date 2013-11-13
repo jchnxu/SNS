@@ -274,6 +274,15 @@ class Sns_authorize extends CI_Controller {
             }
         }
 
+        $t = $token;
+        $access_token = new stdClass;
+        $access_token->type = $t->type; 
+        $access_token->accessToken = $t->accessToken;
+        $access_token->refreshToken = isset ( $t->refreshToken ) ? $t->refreshToken : null;
+        $access_token->macKey = isset ( $t->macKey ) ? $t->macKey : null;
+        $access_token->macAlgorithm = isset ( $t->macAlgorithm ) ? $t->macAlgorithm : null;
+        $this->session->set_userdata('renren_token', $access_token);
+
         // check authorize ok, update db
         if ($token) {
             // ok
@@ -281,7 +290,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Renren', // social_name
                 $client->getUserService()->getUserLogin()['id'], // sn_user_id
-                $token->accessToken, // token1
+                serialize($access_token), // token1
                 '', // token2
                 2, // default_stream_id, here renren home
                 '人人添加成功！', // ok message

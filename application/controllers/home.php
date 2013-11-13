@@ -1,7 +1,10 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+
 require_once 'tx_Config.php';
 require_once 'Tencent.php';
+
+
 
 class Home extends CI_Controller {
 
@@ -45,8 +48,9 @@ class Home extends CI_Controller {
         $account_id = $this->input->post('account_id');
         $stream_id = $this->input->post('stream_id');
         $this->load->model('account_stream_model');
-        $this->account_stream_model->insert_new($account_id, $stream_id, 1); // TODO change the rank!
-        var_dump($this->account_stream_model->fetch_one($account_stream_id));
+        $account_stream_id = $this->account_stream_model->insert_new($account_id, $stream_id, 1); // TODO change the rank!
+        $stream = $this->account_stream_model->fetch_one($account_stream_id);
+        var_dump($this->_generate_stream_content($stream));
     }
 
     private function _generate_params($page) {
@@ -84,7 +88,8 @@ class Home extends CI_Controller {
         // init content
         $content = array(
             'account_stream_id' => $stream->account_stream_id,
-            'stream_id' => $stream->stream_id
+            'stream_id' => $stream->stream_id,
+            'social_name' => $stream->social_name
         );
         
         // check sn type
@@ -99,7 +104,11 @@ class Home extends CI_Controller {
 
             // check stream type
             if ($stream->stream_id == 1) { // home timeline
+
                 $content['stream_items'] = $client->public_timeline()['statuses']; 
+
+                $content['stream_items'] = $client->home_timeline(1, 10)['statuses']; 
+
             }
             else {
             }
@@ -110,12 +119,13 @@ class Home extends CI_Controller {
                 'client_id' => APP_KEY,
                 'client_secret' => APP_SECRET
             ));
-            $client->debug = true;
-            $client->authWithToken($stream->token1);
+            //$client->authWithStoredToken();
+            $t = unserialize($stream->token1);
+            $client->authWithToken($t);
 
             // check stream type
             if ($stream->stream_id == 2) { // home
-                //$content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), 323070858, 30, 1); 
+                $content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), 323070858, 10, 1); 
             }
             else {
             }

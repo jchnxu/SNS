@@ -4,7 +4,17 @@ class Account_stream_model extends CI_Model {
 
     public function insert_new($account_id, $stream_id, $rank) {
         $sql = 'INSERT INTO account_stream(account_id, stream_id, rank) VALUES (?, ?, ?)';
-        return $this->db->query($sql, array($account_id, $stream_id, $rank));
+        $this->db->query($sql, array($account_id, $stream_id, $rank));
+        return $this->get_id($account_id, $stream_id);
+    }
+
+    public function get_id($account_id, $stream_id) {
+        $sql = 'SELECT account_stream_id FROM account_stream WHERE account_id = ? AND stream_id = ?';
+        $query = $this->db->query($sql, array($account_id, $stream_id));
+        if ($query->row() !== false) {
+            return $query->row()->account_stream_id;
+        }
+        return false;
     }
 
     public function fetch_asc($user_id) {
