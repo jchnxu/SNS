@@ -248,6 +248,7 @@ class Sns_authorize extends CI_Controller {
 
         $this->load->library('renren_client');
         $client = $this->renren_client->build(array('client_id' => APP_KEY, 'client_secret' => APP_SECRET));
+             	echo 'aaaaaaaa';
 
         // 处理code -- 根据code来获得token
         if (isset ( $_REQUEST ['code'] )) {

@@ -96,6 +96,10 @@ class Home extends CI_Controller {
         if ($stream->social_name == 'Weibo') {
             
             $this->load->library('weibo_client');
+            
+            $_SESSION['s_access_token'] = $stream->token1;
+            $_SESSION['s_uid'] = $stream->sn_user_id;
+                        
             $client = $this->weibo_client->build(array(
                 'akey' => WB_AKEY,
                 'skey' => WB_SKEY, 
@@ -119,9 +123,14 @@ class Home extends CI_Controller {
                 'client_id' => APP_KEY,
                 'client_secret' => APP_SECRET
             ));
+           
+            $_SESSION['r_access_token'] = $stream->token1;
+            $_SESSION['r_uid'] = $stream->sn_user_id;
+            
             //$client->authWithStoredToken();
             $t = unserialize($stream->token1);
             $client->authWithToken($t);
+        
 
             // check stream type
             if ($stream->stream_id == 2) { // home
@@ -181,8 +190,10 @@ class Home extends CI_Controller {
     				"contenttype" => "0"
     			);
     			$r = Tencent::api('statuses/home_timeline',$params,"GET",false);
+
     			$content['stream_items'] = json_decode($r,true);
     		} else {
+    	
     		
     		}
         
