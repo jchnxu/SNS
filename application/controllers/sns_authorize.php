@@ -5,7 +5,6 @@
 	require_once 'RenrenOAuthApiService.class.php';
 	require_once 'RenrenRestApiService.class.php';	
 	require_once 'douban_config.php';
-	require_once 'tx_Config.php';
 	require_once 'Tencent.php';
 
 
@@ -17,7 +16,7 @@ class Sns_authorize extends CI_Controller {
 	
 	public function txweibo_authorize(){
 		
-		OAuth::init(TX_AKEY, TX_SKEY);
+		OAuthTx::init(TX_AKEY, TX_SKEY);
 		//打开session
 		session_start();
 		
@@ -26,7 +25,7 @@ class Sns_authorize extends CI_Controller {
         	$openid = $_GET['openid'];
         	$openkey = $_GET['openkey'];
         	//获取授权token
-        	$url = OAuth::getAccessToken($code, TX_CALLBACK_URL);
+        	$url = OAuthTx::getAccessToken($code, TX_CALLBACK_URL);
         	$r = Http::request($url);
         	parse_str($r, $out);
         	//存储授权数据
@@ -39,7 +38,7 @@ class Sns_authorize extends CI_Controller {
             	$_SESSION['t_openkey'] = $openkey;
             
             	//验证授权
-            	$r = OAuth::checkOAuthValid(); 
+            	$r = OAuthTx::checkOAuthValid(); 
             	
             	if($r){
         	
@@ -55,6 +54,7 @@ class Sns_authorize extends CI_Controller {
                 		$this->session->userdata('user_id'), // user_id
                 		'Txweibo', // social_name
                			 $uid, // sn_user_id
+               			 '', // avatar url
                			 $_SESSION['t_access_token'], // token1
               			 $_SESSION['t_openid'], // token2
                			 4, // default_stream_id, here douban diary
@@ -141,6 +141,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Douban', // social_name
                 $uid, // sn_user_id
+                '', // avatar url
                 $accesstoken, // token1
                 '', // token2
                 3, // default_stream_id, here douban diary
@@ -210,6 +211,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Weibo', // social_name
                 $token['uid'], // sn_user_id
+                '', // avatar url
                 $token['access_token'], // token1
                 '', // token2
                 1, // default_stream_id, here weibo home_timeline
@@ -248,7 +250,6 @@ class Sns_authorize extends CI_Controller {
 
         $this->load->library('renren_client');
         $client = $this->renren_client->build(array('client_id' => APP_KEY, 'client_secret' => APP_SECRET));
-             	echo 'aaaaaaaa';
 
         // 处理code -- 根据code来获得token
         if (isset ( $_REQUEST ['code'] )) {
@@ -291,6 +292,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Renren', // social_name
                 $client->getUserService()->getUserLogin()['id'], // sn_user_id
+                $client->getUserService()->getUserLogin()['avatar'][0]['url'], // avatar_url
                 serialize($access_token), // token1
                 '', // token2
                 2, // default_stream_id, here renren home
@@ -324,22 +326,23 @@ class Sns_authorize extends CI_Controller {
 
     }
 
-    private function _update_db($user_id, $social_name, $sn_user_id, $token1, $token2, $default_stream_id, $msg_ok, $msg_already) {
+    private function _update_db($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2, $default_stream_id, $msg_ok, $msg_already) {
         
         $this->load->model('account_model');
         $this->load->model('account_stream_model');
 
         // update db
         $account_id = $this->account_model->get_id($user_id, $social_name, $sn_user_id);
+        $max_rank = $this->account_stream_model->get_max_rank($user_id);
         if ($account_id === false) {
             // this account is new here
-            $account_id = $this->account_model->insert_new($user_id, $social_name, $sn_user_id, $token1, $token2);
-            $this->account_stream_model->insert_new($account_id, $default_stream_id, 1); // insert a default stream, (account_id, stream_id, rank) 
+            $account_id = $this->account_model->insert_new($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2);
+            $this->account_stream_model->insert_new($account_id, $default_stream_id, $max_rank + 1); // insert a default stream, (account_id, stream_id, rank) 
             return $msg_ok;
         }
         else {
             // this account already exists 
-            $this->account_model->update($user_id, $social_name, $sn_user_id, $token1, $token2);
+            $this->account_model->update($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2);
             return $msg_already;
         }
     }

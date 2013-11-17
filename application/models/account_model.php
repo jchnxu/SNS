@@ -2,9 +2,9 @@
 
 class Account_model extends CI_Model {
 
-    public function insert_new($user_id, $social_name, $sn_user_id, $token1, $token2) {
-        $sql = 'INSERT INTO account(user_id, social_name, sn_user_id, token1, token2) VALUES (?, ?, ?, ?, ?)';
-        $this->db->query($sql, array($user_id, $social_name, $sn_user_id, $token1, $token2));
+    public function insert_new($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2) {
+        $sql = 'INSERT INTO account(user_id, social_name, sn_user_id, token1, token2, avatar_url) VALUES (?, ?, ?, ?, ?)';
+        $this->db->query($sql, array($user_id, $social_name, $sn_user_id, $token1, $token2, $avatar_url));
         return $this->get_id($user_id, $social_name, $sn_user_id);
     }
 
@@ -17,9 +17,9 @@ class Account_model extends CI_Model {
         return false;
     }
 
-    public function update($user_id, $social_name, $sn_user_id, $token1, $token2) {
-        $sql = 'UPDATE account SET token1 = ?, token2 = ? where user_id = ? AND social_name = ? AND sn_user_id = ?';
-        return $this->db->query($sql, array($token1, $token2, $user_id, $social_name, $sn_user_id));
+    public function update($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2) {
+        $sql = 'UPDATE account SET token1 = ?, token2 = ?, avatar_url = ? where user_id = ? AND social_name = ? AND sn_user_id = ?';
+        return $this->db->query($sql, array($token1, $token2, $avatar_url, $user_id, $social_name, $sn_user_id));
     }
 
     public function get_accounts($user_id) {

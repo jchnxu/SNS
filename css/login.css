@@ -1,3 +1,60 @@
+/* modification of bootstrap and flat-ui */
+
+/* form-control borders */
+input.form-control {
+    border: 2px solid #8fd6f0;
+    border-radius: 99px;
+}
+
+input.form-control:focus, input.form-control:hover {
+    border: 2px solid #00aef8;
+    box-shadow: none;
+}
+
+/* form-control layout */
+input[type="text"].form-control, input[type="password"].form-control {
+    display: inline-block;
+    height: 13px;
+    vertical-align: top;
+    padding: 8px 12px 10px 12px;
+}
+
+/* form-control buttons */
+.my-btn{
+    cursor: pointer;
+    border: none;
+    background: #8fd6f0;
+    color: #ffffff;
+    padding: 6px 8px 7px;
+    line-height: 22px;
+    text-decoration: none;
+    border-radius: 99px;
+    -webkit-transition: 0.25s linear;
+    -moz-transition: 0.25s linear;
+    -o-transition: 0.25s linear;
+    transition: 0.25s linear;
+    -webkit-backface-visibility: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;    
+}
+.my-btn:hover, .my-btn:focus {
+    background-color: #00aef8;
+    color: #ffffff;
+    outline: none;
+    -webkit-transition: 0.25s;
+    -moz-transition: 0.25s;
+    -o-transition: 0.25s;
+    transition: 0.25s;
+    -webkit-backface-visibility: hidden;
+}
+
+
+
+/**/
+
 #forms-wrapper {
     position: fixed;
     width: 200px;

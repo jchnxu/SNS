@@ -54,6 +54,11 @@ define ( "APP_KEY", '554f0b79093642918f322e31ced90960' );
 define ( "APP_SECRET", '7d8492648f044ec6a7eb1141be77dd27' );
 define ( "CALLBACK_URL", "http://127.0.0.1/sns/sns_authorize/renren_authorize" );
 
+// tx weibo
+define( "TX_AKEY" , '801440907' );
+define( "TX_SKEY" , 'c10940ff57340dc6d474f3add1dc5a4e' );
+define( "TX_CALLBACK_URL" , 'http://127.0.0.1/SNS/sns_authorize/txweibo_authorize' );
+
 
 /* End of file constants.php */
 /* Location: ./application/config/constants.php */

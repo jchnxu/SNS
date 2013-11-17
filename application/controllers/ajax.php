@@ -1,6 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once 'tx_Config.php';
 require_once 'Tencent.php';
 
 class Ajax extends CI_Controller {
@@ -80,7 +79,7 @@ class Ajax extends CI_Controller {
         }
         else if ($page == 'contacts') {
         
-        	OAuth::init(TX_AKEY, TX_SKEY);
+        	OAuthTx::init(TX_AKEY, TX_SKEY);
         	session_start();
         	$params = array( 
     				"format" => "json", 
@@ -120,7 +119,7 @@ class Ajax extends CI_Controller {
             	array_push($content['Renren_friends'],$info);
             }
             
-            $this->_escape_load_view('secondary/contacts_view',array());
+            $this->_escape_load_view('secondary/contacts_view',$content);
         }
     }
 

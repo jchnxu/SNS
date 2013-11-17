@@ -52,7 +52,7 @@
                         <input type="password" class="form-control" name="password" id="password" value="" placeholder="密码" />
                     </div>
                     <div class="form-group">
-                        <input type="submit" class="btn form-control" id="login-in" value="登陆"/>
+                        <input type="submit" class="my-btn" id="login-in" value="登陆"/>
                     </div>
                 </form>
             </div>
@@ -71,7 +71,7 @@
                         <input type="password" class="form-control" name="password_confirm" id="password_confirm" value="<?php echo set_value('password_confirm'); ?>" placeholder="重复密码" />
                     </div>
                     <div class="form-group">
-                        <input type="submit" class="btn form-control" value="注册"/>
+                        <input type="submit" class="my-btn" value="注册"/>
                     </div>
                 </form>
             </div>
