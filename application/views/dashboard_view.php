@@ -1,8 +1,56 @@
 <?php
 	function genImage($src, $href) {
-	return '<a href="'.$href.'"><img src="'.$src.'" width=100,height=100 /></a>';
-}
-
+    	return '<a href="'.$href.'"><img src="'.$src.'" width=100,height=100 /></a>';
+    }
+    
+    function stream_items($raw, $social_name) {
+        $result = '';
+        if ($social_name = 'Renren') {
+            foreach ($raw as $item) {
+                $result .= '<div class="stream-item row-fluid">';
+                
+                // item left
+                $result .= '<div class="item-left span2">';
+                $result .= '<div class="owner-avatar row-fluid"><img class="owner-avatar-img" src="' . $item['sourceUser']['avatar'][0]['url'] . '"/></div>';
+                $result .= '<div class="owner-name row-fluid">' . $item['sourceUser']['name'] . '</div>';
+                $result .= '</div>';
+                
+                // item main
+                $result .= '<div class="item-main span10">';
+                $result .= '<div class="item-time">' . $item['time'] . '</div>';
+                $is_foward = $item['type'][0] == 'S'; // type begins with "SHARE"
+                if ($is_foward) {
+                    $result .= '<div class="item-message">';
+                    $result .= $item['message'];
+                    $result .= '</div>';
+                }
+                
+                if ($is_foward) {
+                    $result .= '<div class="item-content foward">';
+                }
+                else {
+                    $result .= '<div class="item-content">';
+                }
+                if (!empty($item['thumbnailUrl']))
+                    $result .= '<div class="item-thumb"><img src="' . $item['thumbnailUrl'] . '"/></div>'; 
+                $result .= '<div class="item-title">' . $item['resource']['title'] . '</div>';
+                $result .= '<div class="item-message">' . $item['resource']['content'] . '</div>';
+                $result .= '<div class="item-attachment"></div>';
+                $result .= '<div class="item-operations">
+                                <div class="typcn typcn-thumbs-up operation-btn"></div>
+                                <div class="typcn typcn-flow-children operation-btn"></div>
+                                <div class="typcn typcn-arrow-back-outline operation-btn"></div>
+                            </div>';
+                $result .= '<div class="item-comments"></div>';
+                $result .= '</div>'; // end of item-content
+                
+                $result .= '</div>'; // end of item-main
+                
+                $result .= '</div>'; // end of stream-item
+            }    
+        }
+        return $result;
+    }
 ?>
 
 <!doctype html>
@@ -11,8 +59,9 @@
 	<meta charset="utf-8">
 	<title>jQuery UI Example Page</title>
 	<link href="<?php echo base_url(); ?>css/normalize.css" rel="stylesheet">
-	<link href="<?php echo base_url(); ?>css/bootstrap.css" rel="stylesheet">
+	<link href="<?php echo base_url(); ?>css/bootstrap.min.css" rel="stylesheet">
 	<link href="<?php echo base_url(); ?>css/flat-ui.css" rel="stylesheet">
+	<link href="<?php echo base_url(); ?>css/typicons.css" rel="stylesheet">
 	<link href="<?php echo base_url(); ?>css/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet">
 	<link href="<?php echo base_url(); ?>css/dashboard.css" rel="stylesheet">
 	<link href="<?php echo base_url(); ?>css/secondary.css" rel="stylesheet">
@@ -61,7 +110,7 @@
             });
 
             $("#add-sn-modal").dialog({
-                //autoOpen: false    
+                autoOpen: false    
             });
             $("#add-sn-button").click(function(){
                 $("#add-sn-modal").dialog("open");
@@ -113,7 +162,7 @@
         function remove_stream() {
         }
         function change_stream_list_width(width) {
-            $("#streams-list").width(width);
+            $("#streams-list").outerWidth(width);
         }
 
     </script>
@@ -132,13 +181,15 @@
     <div id="container">
         <div id="global-nav">
             <ul id="global-menu" class="nav nav-tabs nav-stacked">
-                <li><a onclick="$('#stream-add').toggle();" class="fui-plus"></a></li>
-                <li><a onclick="loadSecondary('settings');" class="fui-gear"></a></li>
-                <li><a onclick="loadPrimary();" class="fui-list"></a></li>
-                <li><a onclick="loadSecondary('analysis');" class="fui-eye"></a></li>
-                <li><a onclick="loadSecondary('contacts');" class="fui-user"></a></li>
-                <li><a href="<?php echo base_url('login/do_logout'); ?>" class="fui-arrow-left"></a></li>
+                <li><a onclick="$('#stream-add').toggle();" class="typcn typcn-plus-outline"></a></li>
+                <li><a onclick="loadSecondary('settings');" class="typcn typcn-spanner-outline"></a></li>
+                <li><a onclick="loadPrimary();" class="typcn typcn-home-outline"></a></li>
+                <li><a onclick="loadSecondary('analysis');" class="typcn typcn-eye-outline"></a></li>
+                <li><a onclick="loadSecondary('contacts');" class="typcn typcn-contacts"></a></li>
+                <li><a href="<?php echo base_url('login/do_logout'); ?>" class="typcn typcn-power-outline"></a></li>
             </ul>
+        </div>
+        <div id="global-line">
         </div>
         <div id="global-main">
             <div id="primary-page" class="page">
@@ -146,12 +197,12 @@
                 
                     <div id="streams-panel">
                         <div id="publish-panel">
-                            <input id="status-input" class="form-control" placeholder="我正在干什么？"/>
-                            <div id="public-status-button" class="btn">发布状态</div>
+                            <input id="status-input" class="form-control" type="text" placeholder="我想说。。。"/>
+                            <div id="public-status-button" class="typcn typcn-media-play-outline icon-btn"></div>
                         </div>
                     
                         <div id="platforms-panel">
-                            <div id="add-sn-button" class="btn btn-info">
+                            <div id="add-sn-button" class="my-btn">
                                 添加社交网络
                             </div>
                             <div id="sn-list" class="">
@@ -180,99 +231,27 @@
                     <div id="streams-list-outer">
                         <ul id="streams-list" class="">
                             <?php foreach( $stream_contents as $stream_content ) : ?>
-                            <li class="stream">
-
-                                <div class="stream-title">
-                                title
-                                </div>
-                                <?php foreach($stream_content['stream_items'] as $item):?>
-                                <div><?php 
-                            			/*
-                                        $updateTime = $item['created_at'];
-                                        $actorName = $item['user']['screen_name'];
-                                        $actorPhotoUrl = $item['user']['profile_image_url'];
-                                        $imagesrc = '<img src =' . $actorPhotoUrl . ' />';
-                                        $fowardPath = $item['text'];
-                                        
-                                        if(isset($item['retweeted_status'])){
-                                            $item = $item['retweeted_status'];
-                                        }
-                                        $contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
-                                        $content = $item['text'];
-                                        
-                                        if(isset($item['bmiddle_pic'])){
-                                            $contentImage = genImage($item['bmiddle_pic'],'#');
-                                        }else if(isset($item['original_pic'])){
-                                            $contentImage = genImage($f['original_pic'],'#');
-                                        }else if(isset($item['thumbnail_pic'])) {
-                                            $contentImage = genImage($item['thumbnail_pic'],'#');
-                                        }else {
-                                            $contentImage = '';
-                                        }
-                                        
-                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                                        echo $imagesrc;
-                                        echo $contenttitle;
-                                        echo "<br>";
-                                        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                                        echo $fowardPath;
-                                        echo $content;
-                                        echo "<br>";
-                                        echo $contentImage;
-                                        echo "<br>";
-                                        echo $updateTime;*/
-										print_r($item);
-                                        echo "<br>";echo "<br>";?></div>
-                                <br>
-                                <?php endforeach;?>
-
-                                <?php if($stream_content['social_name'] == 'Weibo'): ?>
-                                    <div class="stream-title">
-                                    title
+                            <li class="">
+                                <div class="stream">
+                                    <div class="stream-title row-fluid">
+                                        <div class="span2">
+                                            <div class="stream-avatar">
+                                                <img src="<?php echo $stream_content['avatar_url'];?>" />
+                                            </div>
+                                        </div>
+                                        <div class="span8">
+                                            <div class="stream-name"><?php echo $stream_content['stream_name']; ?></div>
+                                        </div>
+                                        <div class="span2">
+                                            <div class="stream-logo">
+                                                <img src="<?php echo base_url($stream_content['stream_logo']);?>" />
+                                            </div>
+                                        </div>
                                     </div>
-                                    <?php foreach($stream_content['stream_items'] as $item):?>
-                                    <div><?php 
-                                
-                                            $updateTime = $item['created_at'];
-                                            $actorName = $item['user']['screen_name'];
-                                            $actorPhotoUrl = $item['user']['profile_image_url'];
-                                            $imagesrc = '<img src =' . $actorPhotoUrl . ' />';
-                                            $fowardPath = $item['text'];
-                                            
-                                            if(isset($item['retweeted_status'])){
-                                                $item = $item['retweeted_status'];
-                                            }
-                                            $contenttitle = '<a href="http://www.weibo.com/u/'.$item['user']['idstr'].'">@'.$item['user']['name'].'</a>';
-                                            $content = $item['text'];
-                                            
-                                            if(isset($item['bmiddle_pic'])){
-                                                $contentImage = genImage($item['bmiddle_pic'],'#');
-                                            }else if(isset($item['original_pic'])){
-                                                $contentImage = genImage($f['original_pic'],'#');
-                                            }else if(isset($item['thumbnail_pic'])) {
-                                                $contentImage = genImage($item['thumbnail_pic'],'#');
-                                            }else {
-                                                $contentImage = '';
-                                            }
-                                            
-                                            echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                                            echo $imagesrc;
-                                            echo $contenttitle;
-                                            echo "<br>";
-                                            echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-                                            echo $fowardPath;
-                                            echo $content;
-                                            echo "<br>";
-                                            echo $contentImage;
-                                            echo "<br>";
-                                            echo $updateTime;
-                                            echo "<br>";echo "<br>";?></div>
-                                    <br>
-                                    <?php endforeach;?>
-                                <?php else: ?>
-                                    <?php print_r($stream_content['stream_items']); ?>
-                                <?php endif; ?>
-
+                                    <div class="stream-items">
+                                        <?php echo stream_items($stream_content['stream_items'],$stream_content['social_name']);?>
+                                    </div>
+                                </div>
                             </li>
                             <?php endforeach;?>
                         </ul>

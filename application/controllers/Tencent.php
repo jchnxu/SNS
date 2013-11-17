@@ -1,10 +1,10 @@
 <?php
 /**
- * OAuth授权类
+ * OAuthTx授权类
  * @author xiaopengzhu <xp_zhu@qq.com>
  * @version 2.0 2012-04-20
  */
-class OAuth
+class OAuthTx
 {
     public static $client_id = '';
     public static $client_secret = '';
@@ -141,7 +141,7 @@ class Tencent
         if (isset($_SESSION['t_access_token'])) {//OAuth 2.0 方式
             //鉴权参数
             $params['access_token'] = $_SESSION['t_access_token'];
-            $params['oauth_consumer_key'] = OAuth::$client_id;
+            $params['oauth_consumer_key'] = OAuthTx::$client_id;
             $params['openid'] = $_SESSION['t_openid'];
             $params['oauth_version'] = '2.a';
             $params['clientip'] = Common::getClientIp();
@@ -152,7 +152,7 @@ class Tencent
             
             $url = self::$apiUrlHttps.trim($command, '/');
         } elseif (isset($_SESSION['t_openid']) && isset($_SESSION['t_openkey'])) {//openid & openkey方式
-            $params['appid'] = OAuth::$client_id;
+            $params['appid'] = OAuthTx::$client_id;
             $params['openid'] = $_SESSION['t_openid'];
             $params['openkey'] = $_SESSION['t_openkey'];
             $params['clientip'] = Common::getClientIp();
@@ -163,7 +163,7 @@ class Tencent
             $url = self::$apiUrlHttp.trim($command, '/');
             //生成签名
             $urls = @parse_url($url);
-            $sig = SnsSign::makeSig($method, $urls['path'], $params, OAuth::$client_secret.'&');
+            $sig = SnsSign::makeSig($method, $urls['path'], $params, OAuthTx::$client_secret.'&');
             $params['sig'] = $sig;
         }
         

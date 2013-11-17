@@ -28,5 +28,11 @@ class Account_stream_model extends CI_Model {
         $query = $this->db->query($sql, array($account_stream_id));
         return $query->row();
     }
+    
+    public function get_max_rank($user_id) {
+        $sql = 'SELECT MAX(rank) FROM account_stream NATURAL JOIN account WHERE user_id = ?';
+        $query = $this->db->query($sql, array($user_id));
+        return $query->result_array()[0]['MAX(rank)'];
+    }
 
 }
