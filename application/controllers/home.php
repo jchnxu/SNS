@@ -134,7 +134,7 @@ class Home extends CI_Controller {
             if ($stream->stream_id == 2) { // home
                 $content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), null, 20, 1); 
             }
-            else { // personal
+            elseif ($stream->stream_id == 5) { // personal
                 $content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), $stream->sn_user_id, 20, 1); 
             }
         }

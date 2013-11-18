@@ -253,8 +253,21 @@
                 handle: ".stream-title"
             });
 
+            $("#publish-status-modal").dialog({
+                autoOpen: false,    
+                dialogClass: "my-modal",
+                width: 450
+            });
+            $("#publish-status-button").click(function(){
+                $("#publish-status-modal").dialog("open");
+            });
+            $(".sn-check-btn").click(function(){
+                $(this).toggleClass("sn-checked");
+            });
+            
             $("#add-sn-modal").dialog({
-                autoOpen: false    
+                autoOpen: false,    
+                dialogClass: "my-modal"    
             });
             $("#add-sn-button").click(function(){
                 $("#add-sn-modal").dialog("open");
@@ -315,6 +328,33 @@
 <body>
     <div id="notification-popup"></div>
     <div id="modals">
+        <div id="publish-status-modal" title="发表状态">
+            <div class="row-fluid">
+                <div class="span9">
+                    <textarea id="status-textarea" class="form-control" rows=5 placeholder="我想说。。。"></textarea>
+                    <div id="status-attachment">
+                        <div id="add-attachment">
+                            <div id="add-photo" class="typcn typcn-location-outline icon-btn"></div>
+                            <div id="add-photo" class="typcn typcn-camera-outline icon-btn"></div>
+                            <div id="publish-status-button" class="typcn typcn-media-play-outline icon-btn"></div>
+                        </div>
+                        <div id="attachment-content"></div>
+                    </div>
+                </div>
+                <div class="span3">
+                    <ul id="status-sn-checklist" class="">
+                        <?php foreach ($add_stream_options as $add_stream_option): ?>
+                        <li>
+                            <a href="#" class="account-title sn-check-btn my-btn my-btn-outline">
+                                <img src="<?php echo $add_stream_option['account']->avatar_url?>" />
+                                <?php echo $add_stream_option['account']->sn_name; ?>
+                            </a>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <div id="add-sn-modal" title="添加社交网站">
             <a target="_blank" onclick="window.open('<?php echo $auth_url['renren']; ?>');"><input type="button" name="renren" value="人人"/></a>
             <a target="_blank" onclick="window.open('https://api.weibo.com/oauth2/authorize?client_id=1401769607&amp;redirect_uri=http%3A%2F%2F127.0.0.1%2FSNS%2Fsns_authorize%2Fweibo_authorize&amp;response_type=code&amp;forcelogin=true','newwindow');"><input type="button" name="weibo" value="新浪微博"/></a>
@@ -340,8 +380,9 @@
                 
                     <div id="streams-panel">
                         <div id="publish-panel">
-                            <input id="status-input" class="form-control" type="text" placeholder="我想说。。。"/>
-                            <div id="public-status-button" class="typcn typcn-media-play-outline icon-btn"></div>
+                            <div id="publish-status-button" class="my-btn my-btn-info">
+                                发表状态
+                            </div>
                         </div>
                     
                         <div id="platforms-panel">
