@@ -3,7 +3,7 @@
 class Account_model extends CI_Model {
 
     public function insert_new($user_id, $social_name, $sn_user_id, $sn_name, $avatar_url, $token1, $token2) {
-        $sql = 'INSERT INTO account(user_id, social_name, sn_user_id, token1, token2, avatar_url, sn_name) VALUES (?, ?, ?, ?, ?, ?)';
+        $sql = 'INSERT INTO account(user_id, social_name, sn_user_id, token1, token2, avatar_url, sn_name) VALUES (?, ?, ?, ?, ?, ?, ?)';
         $this->db->query($sql, array($user_id, $social_name, $sn_user_id, $token1, $token2, $avatar_url, $sn_name));
         return $this->get_id($user_id, $social_name, $sn_user_id);
     }
