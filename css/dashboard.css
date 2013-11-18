@@ -32,6 +32,7 @@ input[type="text"].form-control, input[type="password"].form-control {
 
 /* form-control buttons */
 .my-btn{
+    display: inline-block;
     cursor: pointer;
     border: none;
     background: #8fd6f0;
@@ -60,6 +61,24 @@ input[type="text"].form-control, input[type="password"].form-control {
     -o-transition: 0.25s;
     transition: 0.25s;
     -webkit-backface-visibility: hidden;
+}
+
+.my-btn-outline {
+    background-color: #fff;
+    color: #8fd6f0;
+    border: 2px solid #8fd6f0;
+}
+.my-btn-outline:hover {
+    background-color: #fff;
+    color: #00aef8;
+    border: 2px solid #00aef8;
+}
+
+.my-btn-info {
+    background-color: #1abc9c;
+}
+.my-btn-info:hover{
+    background-color: #16a085;
 }
 
 
@@ -193,7 +212,8 @@ body {
     width: 100%;
     top: 0;
     right: 0;
-    height: 50px;
+    z-index: 99;
+    overflow-y: visible;
     
     padding-top: 5px;
 }
@@ -209,15 +229,33 @@ body {
     float: right;
 }
 
-
-/* stream add */
-#stream-add {
-    z-index: 99;
-    position: absolute;
-    left: 0;
-    top: 0;
-    background-color: #ddd;
-    width: 400px;
+/* sn-list */
+#sn-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#sn-list li {
+    padding: 0;
+    margin: 0;
+}
+#add-sn-button{
+    float: left;
+}
+#sn-list {
+    float: left;
+}
+#sn-list>li {
+    display: inline-block;
+    float: left;
+}
+.account-title {
+    display: inline-block;
+}
+.account-title img {
+    max-height: 15px;
+    max-width: 15px;
+    border-radius: 50%;
 }
 
 /* stream list */

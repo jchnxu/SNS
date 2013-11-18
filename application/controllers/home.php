@@ -132,9 +132,10 @@ class Home extends CI_Controller {
 
             // check stream type
             if ($stream->stream_id == 2) { // home
-                $content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), 323070858, 20, 1); 
+                $content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), null, 20, 1); 
             }
-            else {
+            else { // personal
+                $content['stream_items'] = $client->getFeedService()->listFeed(array('ALL'), $stream->sn_user_id, 20, 1); 
             }
         }
         
