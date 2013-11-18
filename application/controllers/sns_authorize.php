@@ -54,8 +54,8 @@ class Sns_authorize extends CI_Controller {
                 		$this->session->userdata('user_id'), // user_id
                 		'Txweibo', // social_name
                			 $uid, // sn_user_id
-               			 '', // sn_name
-               			 '', // avatar url
+               			 $info['data']['nick'], // sn_name
+               			 $info['data']['head'], // avatar url
                			 $_SESSION['t_access_token'], // token1
               			 $_SESSION['t_openid'], // token2
                			 4, // default_stream_id, here douban diary
@@ -137,13 +137,15 @@ class Sns_authorize extends CI_Controller {
 			curl_close($ch);
 			$user_data = json_decode($res,true);
 			$uid = $user_data['uid'];
+			$screen_name = $user_data['name'];
+			$avatar = $user_data['avatar'];
 			
 			$message = $this->_update_db(
                 $this->session->userdata('user_id'), // user_id
                 'Douban', // social_name
                 $uid, // sn_user_id
-                '', // sn_name
-                '', // avatar url
+                $screen_name, // sn_name
+                $avatar, // avatar url
                 $accesstoken, // token1
                 '', // token2
                 3, // default_stream_id, here douban diary
@@ -208,13 +210,24 @@ class Sns_authorize extends CI_Controller {
             ));
             */
 			setcookie('weibojs_'.$this->weibo_oauth->client_id, http_build_query($token));
+			
+			$ch = curl_init();
+			curl_setopt($ch,CURLOPT_URL,'https://api.weibo.com/2/users/show.json?access_token='.$token['access_token']
+				.'&uid='.$token['uid']);
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+			$response = curl_exec($ch);
+			curl_close($ch);
+			$userinfo = json_decode($response,true);
+			
+			$screen_name = $userinfo['screen_name'];
+			$avatar_url = $userinfo['profile_image_url'];
             
             $message = $this->_update_db(
                 $this->session->userdata('user_id'), // user_id
                 'Weibo', // social_name
                 $token['uid'], // sn_user_id
-                '', // sn_name
-                '', // avatar url
+                $screen_name, // sn_name
+                $avatar_url, // avatar url
                 $token['access_token'], // token1
                 '', // token2
                 1, // default_stream_id, here weibo home_timeline

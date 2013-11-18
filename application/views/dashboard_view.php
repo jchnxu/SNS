@@ -5,7 +5,7 @@
     
     function stream_items($raw, $social_name) {
         $result = '';
-        if ($social_name = 'Renren') {
+        if ($social_name == 'Renren') {
             foreach ($raw as $item) {
                 $result .= '<div class="stream-item row-fluid">';
                 
@@ -49,6 +49,145 @@
                 $result .= '</div>'; // end of stream-item
             }    
         }
+        
+        else if ($social_name == 'Txweibo') {
+        	$raw = $raw['data']['info'];
+            foreach ($raw as $item) {
+                $result .= '<div class="stream-item row-fluid">';
+                
+                // item left
+                $result .= '<div class="item-left span2">';
+                $result .= '<div class="owner-avatar row-fluid"><img class="owner-avatar-img" src="' . $item['head'] . '"/></div>';
+                $result .= '<div class="owner-name row-fluid">' . $item['name'] . '</div>';
+                $result .= '</div>';
+                
+                // item main
+                $result .= '<div class="item-main span10">';
+                date_default_timezone_set('PRC');
+                $time = date("Y-m-d H:i:s",$item['timestamp']);
+                $result .= '<div class="item-time">' . $time . '</div>';
+                $is_foward = $item['type'][0] == 'S'; // type begins with "SHARE"
+                if ($is_foward) {
+                    $result .= '<div class="item-message">';
+                    $result .= $item['message'];
+                    $result .= '</div>';
+                }
+                
+                if ($is_foward) {
+                    $result .= '<div class="item-content foward">';
+                }
+                else {
+                    $result .= '<div class="item-content">';
+                }
+                if (!empty($item['image']))
+                    $result .= '<div class="item-thumb"><img src="' . $item['image'] . '"/></div>'; 
+                //$result .= '<div class="item-title">' . $item['resource']['title'] . '</div>';
+                $result .= '<div class="item-message">' . $item['text'] . '</div>';
+                $result .= '<div class="item-attachment"></div>';
+                $result .= '<div class="item-operations">
+                                <div class="typcn typcn-thumbs-up operation-btn"></div>
+                                <div class="typcn typcn-flow-children operation-btn"></div>
+                                <div class="typcn typcn-arrow-back-outline operation-btn"></div>
+                            </div>';
+                $result .= '<div class="item-comments"></div>';
+                $result .= '</div>'; // end of item-content
+                
+                $result .= '</div>'; // end of item-main
+                
+                $result .= '</div>'; // end of stream-item
+            }    
+        }
+        
+        else if ($social_name == 'Weibo') {
+            foreach ($raw as $item) {
+                $result .= '<div class="stream-item row-fluid">';
+                
+                // item left
+                $result .= '<div class="item-left span2">';
+                $result .= '<div class="owner-avatar row-fluid"><img class="owner-avatar-img" src="' . $item['user']['profile_image_url'] . '"/></div>';
+                $result .= '<div class="owner-name row-fluid">' . $item['user']['screen_name'] . '</div>';
+                $result .= '</div>';
+                
+                date_default_timezone_set('PRC');
+                $time = date("Y-m-d H:i:s",strtotime($item['created_at']));
+                // item main
+                $result .= '<div class="item-main span10">';
+                $result .= '<div class="item-time">' . $time . '</div>';
+                $is_foward = !empty($item['retweeted_status']); // type begins with "SHARE"
+                if ($is_foward) {
+                    $result .= '<div class="item-message">';
+                    $result .= $item['retweeted_status']['text'];
+                    $result .= '</div>';
+                }
+                
+                if ($is_foward) {
+                    $result .= '<div class="item-content foward">';
+                }
+                else {
+                    $result .= '<div class="item-content">';
+                }
+                if (!empty($item['retweeted_status']['thumbnail_pic']))
+                    $result .= '<div class="item-thumb"><img src="' . $item['retweeted_status']['thumbnail_pic'] . '"/></div>'; 
+                //$result .= '<div class="item-title">' . $item['resource']['title'] . '</div>';
+
+                $result .= '<div class="item-message">' . $item['text'] . '</div>';
+                $result .= '<div class="item-attachment"></div>';
+                $result .= '<div class="item-operations">
+                                <div class="typcn typcn-thumbs-up operation-btn"></div>
+                                <div class="typcn typcn-flow-children operation-btn"></div>
+                                <div class="typcn typcn-arrow-back-outline operation-btn"></div>
+                            </div>';
+                $result .= '<div class="item-comments"></div>';
+                $result .= '</div>'; // end of item-content
+                
+                $result .= '</div>'; // end of item-main
+                
+                $result .= '</div>'; // end of stream-item
+            }    
+        }
+        
+        else if ($social_name == 'Douban') {
+        	$image = $raw['user']['avatar'];
+        	$screen_name = $raw['user']['name'];
+        	$raw = $raw['notes'];
+        
+            foreach ($raw as $item) {
+                $result .= '<div class="stream-item row-fluid">';
+                
+                // item left
+                $result .= '<div class="item-left span2">';
+                $result .= '<div class="owner-avatar row-fluid"><img class="owner-avatar-img" src="' . $image . '"/></div>';
+                $result .= '<div class="owner-name row-fluid">' . $screen_name . '</div>';
+                $result .= '</div>';
+                
+                date_default_timezone_set('PRC');
+                $time = date("Y-m-d H:i:s",strtotime($item["publish_time"]));
+                // item main
+                $result .= '<div class="item-main span10">';
+                $result .= '<div class="item-time">' . $time . '</div>';
+                $result .= '<div class="item-content">';
+
+                $result .= '<div class="item-title">' . $item['title'] . '</div>';
+
+                $result .= '<div class="item-message">' . $item['content'] . '</div>';
+                $result .= '<div class="item-attachment"></div>';
+                $result .= '<div class="item-operations">
+                                <div class="typcn typcn-thumbs-up operation-btn"></div>
+                                <div class="typcn typcn-flow-children operation-btn"></div>
+                                <div class="typcn typcn-arrow-back-outline operation-btn"></div>
+                            </div>';
+                $result .= '<div class="item-comments"></div>';
+                $result .= '</div>'; // end of item-content
+                
+                $result .= '</div>'; // end of item-main
+                
+                $result .= '</div>'; // end of stream-item
+            }    
+            
+              
+        }
+        
+        
         return $result;
     }
 ?>
