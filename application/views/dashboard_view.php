@@ -100,6 +100,11 @@
         // controls
         $(function(){
             //$("#global-menu").menu();
+            //$("#sn-list").menu();
+            $("#sn-list>li").click(function(){
+                $(this).find("ul").slideToggle(300);
+            });
+            $("#sn-list>li ul").hide();
             $("#streams-list").sortable({
                 scroll: true,
                 revert: true,
@@ -181,7 +186,6 @@
     <div id="container">
         <div id="global-nav">
             <ul id="global-menu" class="nav nav-tabs nav-stacked">
-                <li><a onclick="$('#stream-add').toggle();" class="typcn typcn-plus-outline"></a></li>
                 <li><a onclick="loadSecondary('settings');" class="typcn typcn-spanner-outline"></a></li>
                 <li><a onclick="loadPrimary();" class="typcn typcn-home-outline"></a></li>
                 <li><a onclick="loadSecondary('analysis');" class="typcn typcn-eye-outline"></a></li>
@@ -202,32 +206,32 @@
                         </div>
                     
                         <div id="platforms-panel">
-                            <div id="add-sn-button" class="my-btn">
+                            <div id="add-sn-button" class="my-btn my-btn-info">
                                 添加社交网络
                             </div>
-                            <div id="sn-list" class="">
-                            </div>
+                            <ul id="sn-list" class="">
+                                <?php foreach ($add_stream_options as $add_stream_option): ?>
+                                <li>
+                                    <a href="#" class="account-title my-btn my-btn-outline">
+                                        <img src="<?php echo $add_stream_option['account']->avatar_url?>" />
+                                        <?php echo $add_stream_option['account']->sn_name; ?>
+                                    </a>
+                                    <ul class="account-stream-options">
+                                        <?php foreach ($add_stream_option['stream_options'] as $stream_option): ?>
+                                        <li class="stream-option">
+                                            <a class="my-btn my-btn-outline" onclick="add_stream(<?php echo $add_stream_option['account']->account_id; ?>, <?php echo $stream_option->stream_id;?> );">
+                                                <span class="typcn typcn-plus"></span>
+                                                <?php echo $stream_option->stream_name ?>
+                                            </a>
+                                        </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
                         </div>
                     </div>
                     
-                    <div id="stream-add">
-                        <div class="">
-                            <?php foreach ($add_stream_options as $add_stream_option): ?>
-                            <div class="account-title">
-                                <?php echo $add_stream_option['account']->account_id; ?>
-                            </div>
-                            <div class="account-stream-options">
-                                <?php foreach ($add_stream_option['stream_options'] as $stream_option): ?>
-                                <div class="stream-option">
-                                    <a onclick="add_stream(<?php echo $add_stream_option['account']->account_id; ?>, <?php echo $stream_option->stream_id;?> );">
-                                        <?php echo $stream_option->stream_name ?>
-                                    </a>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
                     <div id="streams-list-outer">
                         <ul id="streams-list" class="">
                             <?php foreach( $stream_contents as $stream_content ) : ?>

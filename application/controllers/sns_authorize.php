@@ -54,6 +54,7 @@ class Sns_authorize extends CI_Controller {
                 		$this->session->userdata('user_id'), // user_id
                 		'Txweibo', // social_name
                			 $uid, // sn_user_id
+               			 '', // sn_name
                			 '', // avatar url
                			 $_SESSION['t_access_token'], // token1
               			 $_SESSION['t_openid'], // token2
@@ -141,6 +142,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Douban', // social_name
                 $uid, // sn_user_id
+                '', // sn_name
                 '', // avatar url
                 $accesstoken, // token1
                 '', // token2
@@ -211,6 +213,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Weibo', // social_name
                 $token['uid'], // sn_user_id
+                '', // sn_name
                 '', // avatar url
                 $token['access_token'], // token1
                 '', // token2
@@ -292,6 +295,7 @@ class Sns_authorize extends CI_Controller {
                 $this->session->userdata('user_id'), // user_id
                 'Renren', // social_name
                 $client->getUserService()->getUserLogin()['id'], // sn_user_id
+                $client->getUserService()->getUserLogin()['name'], // sn_name
                 $client->getUserService()->getUserLogin()['avatar'][0]['url'], // avatar_url
                 serialize($access_token), // token1
                 '', // token2
@@ -326,7 +330,7 @@ class Sns_authorize extends CI_Controller {
 
     }
 
-    private function _update_db($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2, $default_stream_id, $msg_ok, $msg_already) {
+    private function _update_db($user_id, $social_name, $sn_user_id, $sn_name, $avatar_url, $token1, $token2, $default_stream_id, $msg_ok, $msg_already) {
         
         $this->load->model('account_model');
         $this->load->model('account_stream_model');
@@ -336,13 +340,13 @@ class Sns_authorize extends CI_Controller {
         $max_rank = $this->account_stream_model->get_max_rank($user_id);
         if ($account_id === false) {
             // this account is new here
-            $account_id = $this->account_model->insert_new($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2);
+            $account_id = $this->account_model->insert_new($user_id, $social_name, $sn_user_id, $sn_name, $avatar_url, $token1, $token2);
             $this->account_stream_model->insert_new($account_id, $default_stream_id, $max_rank + 1); // insert a default stream, (account_id, stream_id, rank) 
             return $msg_ok;
         }
         else {
             // this account already exists 
-            $this->account_model->update($user_id, $social_name, $sn_user_id, $avatar_url, $token1, $token2);
+            $this->account_model->update($user_id, $social_name, $sn_user_id, $sn_name, $avatar_url, $token1, $token2);
             return $msg_already;
         }
     }
